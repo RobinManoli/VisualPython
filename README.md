@@ -14,7 +14,7 @@ Proof of concept of visualizing Python code more than just keyword highlighting.
 ![hover over code to highlight brackets](https://raw.githubusercontent.com/RobinManoli/VisualPython/master/img/brackets.jpg)
 
 
-- highlights whitespace with colors, when the mouse cursor moves outside the textarea (to easier distinguish for example tabs from spaces)
+- highlights whitespace with colors, when the mouse cursor moves outside the textarea (you can easily distinguish for example tabs from spaces, and trailing spaces)
 
 ![move mouse cursor outside textarea to see whitespace](https://raw.githubusercontent.com/RobinManoli/VisualPython/master/img/whitespace.jpg)
 
