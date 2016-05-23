@@ -16,8 +16,8 @@ class FileMenu():
         menubar = Menu(self.mainframe)
         self.root.config(menu=menubar)
         fileMenu = Menu(menubar)
-        fileMenu.add_command(label="Open...", command=self.load)
-        fileMenu.add_command(label="Save", command=self.write)
+        fileMenu.add_command(label="Open...", command=self.load, accelerator="Ctrl+O")
+        fileMenu.add_command(label="Save", command=self.write, accelerator="Ctrl+S")
         fileMenu.add_command(label="Exit", command=self.root.quit)
         menubar.add_cascade(label="File", menu=fileMenu)
 
