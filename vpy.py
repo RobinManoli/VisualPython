@@ -28,6 +28,10 @@ class MainFrame(Frame):
         # something is not ready when auto-opening, resulting in for example multiline-counter being messed up
         # though fixed with update
         self.root.update()
+        
+        import sys
+        if len( sys.argv ) > 1:
+            self.FileMenu.open( sys.argv[1] )
 
         #self.root.wait_visibility(self.textarea) # FREEZES
         #self.root.wait_window(self.textarea) # never happens
