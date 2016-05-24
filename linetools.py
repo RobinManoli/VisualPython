@@ -4,36 +4,45 @@ class LineTools(Text):
     """
     """
     def __init__(self, parent):
-        Text.__init__(self, parent, state=DISABLED, yscrollcommand=parent.mainframe.TextArea.scrollYUpdate, width=5, padx=5, pady=5, relief=FLAT)
+        Text.__init__(self, parent, state=DISABLED, wrap=NONE, yscrollcommand=parent.mainframe.TextArea.scrollYUpdate, width=5, padx=5, pady=5, relief=FLAT)
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
 
+        self.last_motion_index = ''
+
         self.init()
 
     def init(self):
-        # self.bind('<Motion>', self.on_motion)
+        self.bind('<Motion>', self.on_motion)
         self.bind('<Button-1>', self.on_click)
 
     def on_motion(self, event=None):
         index = self.index(CURRENT)
-        start, end = self.mainframe.TextArea.getline_start_end(index, self)
+        text = self.mainframe.TextArea.getline(index, self)
+        if not text.strip():
+            return
 
-        self.config(state=NORMAL)
-        #self.delete(start, end)
-        if self.get(end + ' - 1c') != '#':
-            self.insert(end, ' #')
-        self.config(state=DISABLED)
+        if index != self.last_motion_index:
+            self.config(state=NORMAL)
+            if self.last_motion_index:
+                # delete # chars from last motion
+                nline0 = self.mainframe.TextArea.getline_number(self.last_motion_index, self)
+                self.delete('%d.end - 7c' % nline0, '%d.end' % nline0)
+            # add # chars at end of current line's motion
+            start, end = self.mainframe.TextArea.getline_start_end(index, self)
+            self.insert(end, ' ######')
+            self.config(state=DISABLED)
+            self.last_motion_index = index
 
     def on_click(self, event=None):
-        #index = self.index(CURRENT)
         nline = ''
         i = 0
         while not nline.strip():
             # textarea wrapped lines are newlines in linetools, so find the closest above written line number
             i += 1
             nline = self.mainframe.TextArea.getline('current - %dc' % i, widget=self)
-        nline = int(nline)
+        nline = int(nline.rstrip('#'))
         #start, end = self.mainframe.TextArea.getline_start_end(nline)
         line = self.mainframe.TextArea.getline(nline)
         if not line:
