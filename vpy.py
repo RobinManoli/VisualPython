@@ -9,6 +9,7 @@ Known bugs (TODO):
 from tkinter import *
 import filemenu
 import textarea
+import linetools
 import highlight
 
 class MainFrame(Frame):
@@ -20,9 +21,24 @@ class MainFrame(Frame):
         self.root.title("Visual Python")
         self.pack(fill=BOTH, expand=1)
         self.maximize()
+
+        self.mainframe = self
+
+        self.menu = Menu(self)
+        self.root.config(menu=self.menu)
         self.FileMenu = filemenu.FileMenu(self)
+
         self.TextArea = textarea.TextArea(self)
+        self.LineTools = linetools.LineTools(self)
         self.HighLight = highlight.HighLight(self)
+
+        self.LineTools.pack(side=LEFT, fill=Y)
+        self.TextArea.pack(side=LEFT, fill=BOTH, expand=True)
+
+        scrollbarY = Scrollbar(self)
+        scrollbarY.pack(side=RIGHT, fill=Y)
+        scrollbarY.config(command=self.TextArea.scrollY)
+        self.scrollbarY = scrollbarY
 
         # auto-open file at startup (after inits)
         # something is not ready when auto-opening, resulting in for example multiline-counter being messed up

@@ -1,39 +1,38 @@
 from tkinter import *
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
-class FileMenu():
+class FileMenu(Menu):
     """
     """
     def __init__(self, parent):
+        Menu.__init__(self, parent, background="white")
         self.parent = parent
-        self.mainframe = parent
+        self.mainframe = parent.mainframe
         self.root = parent.root
         
         self.init()
 
 
     def init(self):
-        menubar = Menu(self.mainframe)
-        self.root.config(menu=menubar)
-        fileMenu = Menu(menubar)
-        fileMenu.add_command(label="Open...", command=self.load, accelerator="Ctrl+O")
-        fileMenu.add_command(label="Save", command=self.write, accelerator="Ctrl+S")
-        fileMenu.add_command(label="Exit", command=self.root.quit)
-        menubar.add_cascade(label="File", menu=fileMenu)
+        self.add_command(label="Open...", command=self.load, accelerator="Ctrl+O")
+        self.add_command(label="Save", command=self.write, accelerator="Ctrl+S")
+        self.add_command(label="Exit", command=self.root.quit)
+        self.mainframe.menu.add_cascade(label="File", menu=self)
 
         self.root.bind_all('<Control-o>', self.load)
+        self.root.bind_all('<Control-s>', self.write)
 
     def open(self, fname):
         self.mainframe.f = open(fname, 'r+')
         #print( self.mainframe.f )
-        self.mainframe.textarea.delete(1.0, END)
-        self.mainframe.textarea.insert(1.0, self.mainframe.f.read())
+        self.mainframe.TextArea.delete(1.0, END)
+        self.mainframe.TextArea.insert(1.0, self.mainframe.f.read())
         self.mainframe.TextArea.changed()
         
 
     def write(self):
         # http://stackoverflow.com/questions/2424000/read-and-overwrite-a-file-in-python
-        content = self.mainframe.textarea.get(1.0, 'end - 1c')
+        content = self.mainframe.TextArea.get(1.0, 'end - 1c')
         self.mainframe.f.seek(0)
         self.mainframe.f.write(content)
         self.mainframe.f.truncate()
