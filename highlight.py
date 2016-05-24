@@ -71,14 +71,15 @@ class HighLight():
             self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
             self.mainframe.TextArea.mark_set("range_start", "range_end")
 
-
-    def brackets(self, event=None):
-        "Highlights brackets, where brackets in this context includes ()[]{}."
-        #self.highlighted_punctuation += 'content'
-        #print( "@%d,%d" % (event.x, event.y) ) # mouse coords
+    def clear_brackets(self, event=None):
         for tag in self.mainframe.TextArea.tag_names():
             if tag.startswith('Bracket.'):
                 self.mainframe.TextArea.tag_remove(tag, 1.0, END)
+
+    def brackets(self, event=None):
+        "Highlights brackets, where brackets in this context includes ()[]{}."
+        #print( "@%d,%d" % (event.x, event.y) ) # mouse coords
+        self.clear_brackets()
 
         index = self.mainframe.TextArea.index(CURRENT)
         nline, nchar = index.split('.')

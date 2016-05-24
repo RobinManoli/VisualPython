@@ -149,5 +149,6 @@ class TextArea(Text):
         #print( end, repr(text[end]))
 
         self.tag_add(SEL, "%d.%d" % (nline,start), "%d.%d" % (nline,end))
+        self.mainframe.HighLight.clear_brackets()
         return "break"
         
