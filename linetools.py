@@ -15,7 +15,7 @@ class LineTools(Text):
 
     def init(self):
         self.bind('<Motion>', self.on_motion)
-        self.bind('<Button-1>', self.on_click)
+        self.bind('<Double-Button-1>', self.on_dclick)
 
     def on_motion(self, event=None):
         index = self.index(CURRENT)
@@ -35,7 +35,7 @@ class LineTools(Text):
             self.config(state=DISABLED)
             self.last_motion_index = index
 
-    def on_click(self, event=None):
+    def on_dclick(self, event=None):
         nline = ''
         i = 0
         while not nline.strip():
