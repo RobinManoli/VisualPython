@@ -5,7 +5,7 @@ Proof of concept editor, visualizing Python code more than just keyword highligh
 
 
 ## Requirements
-- Python 3
+- Python 3 (for now)
 - tkinter
 - Pygments 2.1.3 (only version tested)
 
@@ -14,7 +14,7 @@ Proof of concept editor, visualizing Python code more than just keyword highligh
 ![hover over code to highlight brackets](https://raw.githubusercontent.com/RobinManoli/VisualPython/master/img/brackets.jpg)
 
 
-- highlights whitespace with colors, when the mouse cursor moves outside the textarea (you can easily distinguish for example tabs from spaces, and trailing spaces)
+- highlights whitespace with colors, when the mouse cursor moves outside the main text widget (you can easily distinguish for example tabs from spaces, and trailing spaces)
 
 ![move mouse cursor outside textarea to see whitespace](https://raw.githubusercontent.com/RobinManoli/VisualPython/master/img/whitespace.jpg)
 
