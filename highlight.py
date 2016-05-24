@@ -82,6 +82,14 @@ class HighLight():
 
         index = self.mainframe.TextArea.index(CURRENT)
         nline, nchar = index.split('.')
+        try:
+            # no selection rasies TclError
+            self.mainframe.TextArea.index(SEL_FIRST)
+            if nline == self.mainframe.TextArea.index(SEL_FIRST).split('.')[0] or nline == self.mainframe.TextArea.index(SEL_LAST).split('.')[0]:
+                # fix invisible selection when selecting highlighted brackets by not highlighting during selection on that line
+                return
+        except TclError:
+            pass
         nline = int(nline)
         #nchar = int(nchar)
         start = "%d.0" % nline
