@@ -26,12 +26,20 @@ class LineTools(Text):
         self.config(state=DISABLED)
 
     def on_click(self, event=None):
-        index = self.index(CURRENT)
-        line = self.mainframe.TextArea.getline(index)
+        #index = self.index(CURRENT)
+        nline = ''
+        i = 0
+        while not nline.strip():
+            # textarea wrapped lines are newlines in linetools, so find the closest above written line number
+            i += 1
+            nline = self.mainframe.TextArea.getline('current - %dc' % i, widget=self)
+        nline = int(nline)
+        #start, end = self.mainframe.TextArea.getline_start_end(nline)
+        line = self.mainframe.TextArea.getline(nline)
         if not line:
             return
 
-        start, end = self.mainframe.TextArea.getline_start_end(index)
+        start, end = self.mainframe.TextArea.getline_start_end(nline)
         whitespace = self.mainframe.TextArea.get_whitespace(line)
 
         #while not self.mainframe.TextArea.get(start, start + '+ 1c').lstrip():

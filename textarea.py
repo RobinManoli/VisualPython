@@ -12,10 +12,6 @@ class TextArea(Text):
     def init(self):
         self.do_highlight_whitespace = False
 
-        #linetools = Text(self.mainframe, state=DISABLED, yscrollcommand=self.scrollYUpdate, width=5, padx=5, pady=5, relief=FLAT)
-        #linetools.pack(side=LEFT, fill=Y)
-        #self.mainframe.LineTools = linetools
-
         #self.bind('<<Modified>>', self.changed) # works only once
         self.bind('<KeyRelease>', self.changed)
         self.bind('<Motion>', self.on_motion)
@@ -44,18 +40,23 @@ class TextArea(Text):
     def getline_start_end(self, index=INSERT, widget=None):
         "Get the start and end indeces of retrieved line number."
         widget = widget or self
-        nline = self.getline_number(index, widget)
+        integer = 1
+        if type(index) == type(integer):
+            nline = index
+        else:
+            nline = self.getline_number(index, widget)
         start = "%d.0" % nline
         end = "%d.0 - 1c" % (nline + 1)
         return start, end
 
-    def getline(self, index=INSERT):
+    def getline(self, index=INSERT, widget=None):
         "Get text content of line index. Index may be a tk text widget index or a line number."
+        widget = widget or self
         integer = 1
         if type(index) == type(integer):
             index = str(index) + '.0'
-        start, end = self.getline_start_end(index)
-        return self.get(start, end)
+        start, end = self.getline_start_end(index, widget)
+        return widget.get(start, end)
         
     def scrollY(self, action, position, type=None):
         self.yview_moveto(position)
