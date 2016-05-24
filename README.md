@@ -1,5 +1,5 @@
-# vpy.py
-Proof of concept of visualizing Python code more than just keyword highlighting.
+# Visual Python - vpy.py
+Proof of concept editor, visualizing Python code more than just keyword highlighting.
 
 ![keyword highlighting](https://raw.githubusercontent.com/RobinManoli/VisualPython/master/img/highlight.jpg)
 
