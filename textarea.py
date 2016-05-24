@@ -20,6 +20,7 @@ class TextArea(Text):
         self.bind('<Return>', self.on_return)
         self.bind('<Tab>', self.on_tab)
         self.bind('<Shift-Tab>', self.on_shift_tab)
+        self.bind('<Double-Button-1>', self.on_dclick)
 
     def get_whitespace(self, text):
         "Finds and returns the whitespace of the beginning of text."
@@ -131,3 +132,22 @@ class TextArea(Text):
                     break
         return "break"
 
+    def on_dclick(self, event=None):
+        char = self.get(INSERT, 'insert + 1c')
+        if not char.strip():
+            # handle double clicking whitespace normally
+            return
+
+        text = self.getline()
+        nline, start = self.index(INSERT).split('.')
+        nline = int(nline)
+        start = end = int(start)
+        while text[start-1].isalnum() or text[start-1] == '_':
+            start -= 1
+        while text[end].isalnum() or text[end] == '_':
+            end += 1
+        #print( end, repr(text[end]))
+
+        self.tag_add(SEL, "%d.%d" % (nline,start), "%d.%d" % (nline,end))
+        return "break"
+        
