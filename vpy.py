@@ -3,11 +3,16 @@
 
 """
 Known bugs (TODO):
-    - 
+    - triple click text in editor not working (because of custom dclick?)
+
+Next features (todo):
+    - highlight repetitions of selected text
+    - tabs for multiple opened files
 """
 
 from tkinter import *
 import filemenu
+import texthelper
 import textarea
 import linetools
 import highlight
@@ -23,6 +28,7 @@ class MainFrame(Frame):
         self.maximize()
 
         self.mainframe = self
+        self.texthelper = texthelper
 
         self.menu = Menu(self)
         self.root.config(menu=self.menu)

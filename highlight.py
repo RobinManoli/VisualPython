@@ -171,7 +171,7 @@ class HighLight():
         #content = self.mainframe.TextArea.get("range_start", "range_end")
 
 
-    def highlight(self, event=None, forced=False):
+    def highlight(self, event=None, forced=False, do_whitespace=False):
         # http://stackoverflow.com/a/30199105
         from pygments import lex, highlight
         from pygments.lexers import PythonLexer
@@ -205,7 +205,7 @@ class HighLight():
                 pass
 
             strtoken = str(token)
-            if self.mainframe.TextArea.do_highlight_whitespace \
+            if do_whitespace \
             and strtoken == 'Token.Text' and not content.strip() and \
             (not prev_content.strip() or len(content) > 1 or '\n' in content):
                 self.whitespace(strtoken, content, prev_content)

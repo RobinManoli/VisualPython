@@ -10,8 +10,6 @@ class TextArea(Text):
         self.init()
 
     def init(self):
-        self.do_highlight_whitespace = False
-
         #self.bind('<<Modified>>', self.changed) # works only once
         self.bind('<KeyRelease>', self.changed)
         self.bind('<Motion>', self.on_motion)
@@ -21,43 +19,6 @@ class TextArea(Text):
         self.bind('<Tab>', self.on_tab)
         self.bind('<Shift-Tab>', self.on_shift_tab)
         self.bind('<Double-Button-1>', self.on_dclick)
-
-    def get_whitespace(self, text):
-        "Finds and returns the whitespace of the beginning of text."
-        whitespace = ''
-        if text != text.lstrip():
-            for c in text:
-                if c.strip():
-                    break
-                whitespace += c
-        return whitespace
-
-    def getline_number(self, index=INSERT, widget=None):
-        widget = widget or self
-        index = widget.index(index)
-        nline = int( index.split('.')[0] )
-        return nline
-        
-    def getline_start_end(self, index=INSERT, widget=None):
-        "Get the start and end indeces of retrieved line number."
-        widget = widget or self
-        integer = 1
-        if type(index) == type(integer):
-            nline = index
-        else:
-            nline = self.getline_number(index, widget)
-        start = "%d.0" % nline
-        end = "%d.0 - 1c" % (nline + 1)
-        return start, end
-
-    def getline(self, index=INSERT, widget=None):
-        "Get text content of line index. Index may be a tk text widget index or a line number."
-        widget = widget or self
-        integer = 1
-        if type(index) == type(integer):
-            index = str(index) + '.0'
-        start, end = self.getline_start_end(index, widget)
-        return widget.get(start, end)
         
     def scrollY(self, action, position, type=None):
         self.yview_moveto(position)
@@ -78,57 +39,46 @@ class TextArea(Text):
         self.mainframe.HighLight.brackets(event)
 
     def on_leave(self, event=None):
-        self.do_highlight_whitespace = True
-        self.mainframe.highlight(event, forced=True)
+        # hilight whitespace
+        self.mainframe.highlight(event, forced=True, do_whitespace=True)
 
     def on_enter(self, event=None):
-        self.do_highlight_whitespace = False
-        self.mainframe.highlight(event, forced=True)
+        # unhilight whitespace
+        self.mainframe.highlight(event, forced=True, do_whitespace=False)
 
     def on_return(self, event=None):
-        "Create whitespace for new lines (same as above line)"
-        line = self.getline()
-        whitespace = self.get_whitespace(line)
-        self.insert(INSERT, '\n' + whitespace)
+        "Create indentation for new lines (same as above line)"
+        line = self.mainframe.texthelper.Line(self)
+        self.insert(INSERT, '\n' + line.indent)
         return "break"
 
     def on_tab(self, event=None):
-        "Add whitespace (same as above line with more)"
-        start, end = self.getline_start_end()
-        if self.get(start, INSERT).lstrip():
-            # normal tab if cursor not in leading whitespace
+        "Add indentation (same as nearest above line with more)"
+        line = self.mainframe.texthelper.Line(self)
+        if self.get(line.start, INSERT).lstrip():
+            # normal tab if cursor not in leading indentation
             return
 
-        line = self.getline()
-        whitespace = self.get_whitespace(line)
-        nline = self.getline_number()
-        # find nearest above line with lesser whitespace
-        for i in range(nline + 1, self.getline_number('end - 1c')):
-            line2 = self.getline(i)
-            whitespace2 = self.get_whitespace(line2)
-            if len(whitespace) < len(whitespace2):
-                while not self.get(start, start + '+ 1c').lstrip():
-                    self.delete(start, start + '+ 1c')
-                self.insert(start, whitespace2)
-                #print( repr(whitespace2) )
+        # find nearest above line with lesser indentation
+        for i in range(line.n - 1, 1, -1):
+            line2 = self.mainframe.texthelper.Line(self, i)
+            if len(line.indent) < len(line2.indent):
+                self.delete(line.start, line.start + '+ %dc' % len(line.indent))
+                self.insert(line.start, line2.indent)
+                #print( repr(line2.indent) )
                 return "break"
 
     def on_shift_tab(self, event=None):
-        "Remove whitespace (same as above line with lesser)"
-        line = self.getline()
-        whitespace = self.get_whitespace(line)
-        if whitespace:
-            nline = self.getline_number()
-            # find nearest above line with lesser whitespace
-            for i in range(nline, 1, -1):
-                line2 = self.getline(i)
-                whitespace2 = self.get_whitespace(line2)
-                if len(whitespace) > len(whitespace2):
-                    start, end = self.getline_start_end()
-                    while not self.get(start, start + '+ 1c').lstrip():
-                        self.delete(start, start + '+ 1c')
-                    self.insert(start, whitespace2)
-                    #print( repr(whitespace2) )
+        "Remove indentation (same as above line with lesser)"
+        line = self.mainframe.texthelper.Line(self)
+        if line.indent:
+            # find nearest above line with lesser indentation
+            for i in range(line.n, 1, -1):
+                line2 = self.mainframe.texthelper.Line(self, i)
+                if len(line.indent) > len(line2.indent):
+                    self.delete(line.start, line.start + '+ %dc' % len(line.indent))
+                    self.insert(line.start, line2.indent)
+                    #print( repr(line2.indent) )
                     break
         return "break"
 
@@ -138,17 +88,17 @@ class TextArea(Text):
             # handle double clicking whitespace normally
             return
 
-        text = self.getline()
-        nline, start = self.index(INSERT).split('.')
-        nline = int(nline)
+        line = self.mainframe.texthelper.Line(self)
+        n, start = self.index(INSERT).split('.')
         start = end = int(start)
-        while text[start-1].isalnum() or text[start-1] == '_':
+        while line.text[start-1].isalnum() or line.text[start-1] == '_':
             start -= 1
-        while text[end].isalnum() or text[end] == '_':
+        while len(line.text) > end and (line.text[end].isalnum() or line.text[end] == '_'):
             end += 1
         #print( end, repr(text[end]))
 
-        self.tag_add(SEL, "%d.%d" % (nline,start), "%d.%d" % (nline,end))
+        self.tag_add(SEL, "%d.%d" % (line.n,start), "%d.%d" % (line.n,end))
+        # hide hilighted brackets when dclick selecting text
         self.mainframe.HighLight.clear_brackets()
         return "break"
         
