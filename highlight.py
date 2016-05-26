@@ -57,20 +57,37 @@ class HighLight():
         #self.mainframe.TextArea.tag_configure("Token.Operator", foreground="#248F24", background="#eeeeee")
         self.mainframe.TextArea.tag_configure("Token.Operator.Word", foreground="#CC7A00")
 
-    def index_is_visible(self, index):
-        return bool( self.mainframe.TextArea.bbox(index) )
+    #def index_is_visible(self, index):
+    #    return bool( self.mainframe.TextArea.bbox(index) )
 
-    def whitespace(self, strtoken, content, prev_content, event=None):
-        #print("'%s'" % content)
+    def clear_whitespace(self, event=None):
+        for tag in self.mainframe.TextArea.tag_names():
+            if tag.startswith('Token.Text.Whitespace.'):
+                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
+
+    def whitespace( self, event=None ):
+        tv = self.mainframe.texthelper.top_visible(self.mainframe.TextArea)
+        bv = self.mainframe.texthelper.bottom_visible(self.mainframe.TextArea)
+        last_newline = 0
+        content = self.mainframe.TextArea.get(tv, bv)
         for i, char in enumerate(content):
-            self.mainframe.TextArea.mark_set("range_end", "range_start + 1c")
             if char == '\n':
-                tag = strtoken + '.Whitespace.Newline'
+                tag = 'Token.Text.Whitespace.Newline'
+                last_newline = i
+            elif not char.strip():
+                if i > 0 and content[i-1].strip():
+                    # prev char not whitespace
+                    continue
+                if i <= len(content) and content[i+1].strip():
+                    # next char not whitespace
+                    continue
+                tag = 'Token.Text.Whitespace.Leading' + str( (i-last_newline)%3 )
             else:
-                tag = strtoken + '.Whitespace.Leading' + str(i%3)
+                continue
+            self.mainframe.TextArea.mark_set("range_start", tv + ' + %dc' % i)
+            self.mainframe.TextArea.mark_set("range_end", 'range_start + 1 c')
             self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
-            self.mainframe.TextArea.mark_set("range_start", "range_end")
-
+    
     def clear_brackets(self, event=None):
         for tag in self.mainframe.TextArea.tag_names():
             if tag.startswith('Bracket.'):
@@ -99,7 +116,7 @@ class HighLight():
         found = ''
         for i, c in enumerate(text):
             current = "%s + %dc" % (start,i)
-            if not self.index_is_visible(current):
+            if not self.mainframe.texthelper.visible(self.mainframe.TextArea, current): #self.index_is_visible(current):
                 # this char (and following at least when using wrap) not visible anymore
                 break
 
@@ -205,14 +222,10 @@ class HighLight():
                 pass
 
             strtoken = str(token)
-            if do_whitespace \
-            and strtoken == 'Token.Text' and not content.strip() and \
-            (not prev_content.strip() or len(content) > 1 or '\n' in content):
-                self.whitespace(strtoken, content, prev_content)
-            else:
-                self.mainframe.TextArea.mark_set("range_end", "range_start + %dc" % len(content))
-                self.mainframe.TextArea.tag_add(strtoken, "range_start", "range_end")
-                self.mainframe.TextArea.mark_set("range_start", "range_end")
+            #and not content.strip():
+            self.mainframe.TextArea.mark_set("range_end", "range_start + %dc" % len(content))
+            self.mainframe.TextArea.tag_add(strtoken, "range_start", "range_end")
+            self.mainframe.TextArea.mark_set("range_start", "range_end")
             
             #prev_strtoken = strtoken
             prev_content = content
