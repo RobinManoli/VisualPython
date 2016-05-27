@@ -92,100 +92,70 @@ class HighLight():
                 self.mainframe.TextArea.tag_remove(tag, 1.0, END)
 
     def brackets(self, event=None):
-        "Highlights brackets, where brackets in this context includes ()[]{}."
-        #print( "@%d,%d" % (event.x, event.y) ) # mouse coords
         self.clear_brackets()
+        line = self.mainframe.texthelper.Line(self.mainframe.TextArea, CURRENT)
 
-        index = self.mainframe.TextArea.index(CURRENT)
-        nline, nchar = index.split('.')
         try:
             # no selection rasies TclError
             self.mainframe.TextArea.index(SEL_FIRST)
-            if nline == self.mainframe.TextArea.index(SEL_FIRST).split('.')[0] or nline == self.mainframe.TextArea.index(SEL_LAST).split('.')[0]:
+            if line.n == self.mainframe.TextArea.index(SEL_FIRST).split('.')[0] or line.n == self.mainframe.TextArea.index(SEL_LAST).split('.')[0]:
                 # fix invisible selection when selecting highlighted brackets by not highlighting during selection on that line
                 return
         except TclError:
+            #print('no selection')
             pass
-        nline = int(nline)
-        #nchar = int(nchar)
-        start = "%d.0" % nline
-        #end = "%d.0 - 1c" % (nline+1)
-        text = self.mainframe.TextArea.get(start, END)
+
+        bv = self.mainframe.texthelper.bottom_visible(self.mainframe.TextArea)
+        text = self.mainframe.TextArea.get(line.start, bv)
+
         found = ''
+        openers = '([{<'
+        closers = ')]}>' # corresponds to openers' indeces
+        # set 0 balance for each bracket type
+        # where positive balance means there are more openers than closers for that type
+        balance = [0 for o in openers]
         for i, c in enumerate(text):
-            current = "%s + %dc" % (start,i)
-            if not self.mainframe.texthelper.visible(self.mainframe.TextArea, current): #self.index_is_visible(current):
-                # this char (and following at least when using wrap) not visible anymore
+            current = "%s + %dc" % (line.start, i)
+            if not self.mainframe.texthelper.visible(self.mainframe.TextArea, current):
+                # this char (and following text at least when using wrap) not visible anymore
+                # if not using wrap, next line might be visible
                 break
 
-
-            found += c if c in '()[]{}<>' else ''
-            poc = found.count('(')
-            pcc = found.count(')')
-            pb = poc - pcc
-            boc = found.count('[')
-            bcc = found.count(']')
-            bb = boc - bcc
-            coc = found.count('{')
-            ccc = found.count('}')
-            cb = coc - ccc
-            toc = found.count('<')
-            tcc = found.count('>')
-            tb = toc - tcc
-            b = pb + bb + cb + tb
+            if c in openers or c in closers:
+                found += c
+                
+                if c in openers:
+                    opener = True
+                    index = openers.index(c)
+                    balance[index] += 1
+                else:
+                    opener = False
+                    index = closers.index(c)
+                    balance[index] -= 1
+                    
+                balance_sum = sum(balance)
             
-            if found and not pb and not bb and not cb:
-                # stop looking for brackets if all brackets are closed and at least the line of the mouse cursor (CURRENT) is fully scanned
-                index2 = self.mainframe.TextArea.index(current)
-                nline2, nchar2 = index2.split('.')
-                nline2 = int(nline2)
-                if nline2 != nline:
-                    break
+                if found and not balance_sum and balance.count(0) == len(openers):
+                    # brackets found and all brackets closed
+                    # stop looking for brackets if at least the line of the mouse cursor (CURRENT) is fully scanned
+                    line2 = self.mainframe.texthelper.Line(self.mainframe.TextArea, current)
+                    if line2.n != line.n:
+                        break
 
-            tag = "Bracket.Token.Punctuation.Bracket" + str( b+1 )
-            if c == '(':
-                if pb > 0:
-                    self.mainframe.TextArea.mark_set("range_start_pb%d"%b, "%s + %dc" % (start,i))
-                    #print('(', poc, pb, b, i, tag)
-            elif c == ')':
-                if pb >= 0:
-                    self.mainframe.TextArea.mark_set("range_end_pb%d"%(b+1), "%s + %dc" % (start,i+1))
-                    self.mainframe.TextArea.tag_add(tag, "range_start_pb%d"%(b+1), "range_end_pb%d"%(b+1))
-                    #print(')', poc, pb, b, i)
-            elif c == '[':
-                if bb > 0:
-                    self.mainframe.TextArea.mark_set("range_start_pb%d"%b, "%s + %dc" % (start,i))
-            elif c == ']':
-                if bb >= 0:
-                    self.mainframe.TextArea.mark_set("range_end_pb%d"%(b+1), "%s + %dc" % (start,i+1))
-                    self.mainframe.TextArea.tag_add(tag, "range_start_pb%d"%(b+1), "range_end_pb%d"%(b+1))
-            elif c == '{':
-                if cb > 0:
-                    self.mainframe.TextArea.mark_set("range_start_pb%d"%b, "%s + %dc" % (start,i))
-            elif c == '}':
-                if cb >= 0:
-                    self.mainframe.TextArea.mark_set("range_end_pb%d"%(b+1), "%s + %dc" % (start,i+1))
-                    self.mainframe.TextArea.tag_add(tag, "range_start_pb%d"%(b+1), "range_end_pb%d"%(b+1))
-            elif c == '<':
-                if tb > 0:
-                    self.mainframe.TextArea.mark_set("range_start_pb%d"%b, "%s + %dc" % (start,i))
-            elif c == '>':
-                if tb >= 0:
-                    self.mainframe.TextArea.mark_set("range_end_pb%d"%(b+1), "%s + %dc" % (start,i+1))
-                    self.mainframe.TextArea.tag_add(tag, "range_start_pb%d"%(b+1), "range_end_pb%d"%(b+1))
+                tag = "Bracket.Token.Punctuation.Bracket" + str( balance_sum+1 )
+                
+                if opener and balance[index] > 0:
+                    mark = "range_start_%s%s%d" % (openers[index], closers[index], balance_sum)
+                    pos = "%s + %dc" % (line.start, i)
+                    self.mainframe.TextArea.mark_set(mark, pos)
 
-            #self.mainframe.TextArea.mark_set("range_start", "%s + %dc" % (start,i))
-            #self.mainframe.TextArea.mark_set("range_end", "range_start + 1c")
-            #self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
-        
-        #print( self.mainframe.TextArea.index(CURRENT), self.mainframe.TextArea.get(start, end) )
+                elif not opener and balance[index] >= 0:
+                    mark = "range_end_%s%s%d" % (openers[index], closers[index], balance_sum+1)
+                    pos = "%s + %dc" % (line.start, i+1)
+                    self.mainframe.TextArea.mark_set(mark, pos)
+                    self.mainframe.TextArea.tag_add(tag, mark.replace('range_end_', 'range_start_'), mark)
 
-        #self.mainframe.TextArea.mark_set("range_start", "%d.0" % nline)
-        #self.mainframe.TextArea.mark_set("range_end", "%d.0 - 1c" % (nline+1))
-        #self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
-        #content = self.mainframe.TextArea.get("range_start", "range_end")
 
-        
     def clear_tokens(self, event=None):
         for tag in self.mainframe.TextArea.tag_names():
             # although only Token.Literal.String.Doc gets messed up, to fix this I've only found (inefficiently) removing all token tags to work
@@ -223,13 +193,12 @@ class HighLight():
                 print('no content in HighLight.tokens() loop')
                 continue
 
-            #strtoken == 'Token.Literal.String.Doc' \
+            #str(token) == 'Token.Literal.String.Doc' \
             if self.mainframe.texthelper.visible(self.mainframe.TextArea, '1.0 + %dc' % i) \
             or self.mainframe.texthelper.visible(self.mainframe.TextArea, '1.0 + %dc' % (i+lencontent)):
-                strtoken = str(token)
                 self.mainframe.TextArea.mark_set("range_start", "1.0 + %dc" %i )
                 self.mainframe.TextArea.mark_set("range_end", "range_start + %dc" % lencontent)
-                self.mainframe.TextArea.tag_add(strtoken, "range_start", "range_end")
+                self.mainframe.TextArea.tag_add(str(token), "range_start", "range_end")
 
             i += lencontent
 
