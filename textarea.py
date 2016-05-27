@@ -29,11 +29,13 @@ class TextArea(Text):
         self.yview_moveto(first)
         self.mainframe.LineTools.yview_moveto(first)
         self.mainframe.scrollbarY.set(first, last)
+        self.mainframe.HighLight.tokens('scrollYUpdate')
 
     def changed(self, event=None):
         #print(repr(event.char))
+        #if event and event.char == '\r': # example to detect keypress return during anykepress
         self.mainframe.LineTools.update_linenumbers(event)
-        self.mainframe.highlight(event, forced=True)
+        self.mainframe.HighLight.tokens(event)
 
     def on_motion(self, event=None):
         self.mainframe.HighLight.brackets(event)

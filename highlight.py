@@ -8,8 +8,6 @@ class HighLight():
         self.mainframe = parent.mainframe
         self.root = parent.root
 
-        self.mainframe.highlight = self.highlight
-
         self.init()
 
     def init(self):
@@ -187,53 +185,52 @@ class HighLight():
         #self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
         #content = self.mainframe.TextArea.get("range_start", "range_end")
 
+        
+    def clear_tokens(self, event=None):
+        for tag in self.mainframe.TextArea.tag_names():
+            # although only Token.Literal.String.Doc gets messed up, to fix this I've only found (inefficiently) removing all token tags to work
+            # do not remove SEL "sel" tags
+            if tag.startswith('Token.'):
+                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
+        #self.mainframe.TextArea.tag_remove('Token.Literal.String.Doc', 1.0, END) # failed to fix (editing ending chars of) multiline string bug
 
-    def highlight(self, event=None, forced=False, do_whitespace=False):
+    def tokens(self, event=None):
         # http://stackoverflow.com/a/30199105
         from pygments import lex, highlight
         from pygments.lexers import PythonLexer
         from pygments.formatters import HtmlFormatter
 
-        data = self.mainframe.TextArea.get("1.0", "end-1c")
-        if data == self.prevdata and not forced:
+        # don't use because multiline strings can start at beginning and end in visible view
+        #tv = self.mainframe.texthelper.top_visible(self.mainframe.TextArea)
+        # use since highlight works if multiline str not properly closed
+        bv = self.mainframe.texthelper.bottom_visible(self.mainframe.TextArea)
+        data = self.mainframe.TextArea.get("1.0", bv) # "end-1c"
+
+        if data == self.prevdata:
             return
 
-        # print(self.mainframe.TextArea.tag_remove.__code__.co_varnames) # see parameter names of a function
-        #print( self.mainframe.TextArea.mark_names() )
-        #print( self.mainframe.TextArea.tag_names() )
-        
-        for tag in self.mainframe.TextArea.tag_names():
-            # although only Token.Literal.String.Doc gets messed up, to fix this I've only found (inefficiently) removing all tags to work
-            # do not remove SEL "sel" tags
-            if tag.startswith('Token.'):
-                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
-        #self.mainframe.TextArea.tag_remove('Token.Literal.String.Doc', 1.0, END) # failed to fix (editing ending chars of) multiline string bug
-        self.mainframe.TextArea.mark_set("range_start", "1.0")
+        self.clear_tokens()
+
         #print( highlight(data, PythonLexer(), HtmlFormatter()))
-
-        #prev_strtoken = ''
         prev_content = ''
-        self.highlighted_punctuation = ''
+
+        i = 0
         for token, content in lex(data, PythonLexer()):
-            #if not content:
-            #    continue
-            if event and event.char == '\r':
-                #print(content, token, len(content)) # on keypress enter
-                pass
+            lencontent = len(content)
 
-            strtoken = str(token)
-            #and not content.strip():
-            self.mainframe.TextArea.mark_set("range_end", "range_start + %dc" % len(content))
-            self.mainframe.TextArea.tag_add(strtoken, "range_start", "range_end")
-            self.mainframe.TextArea.mark_set("range_start", "range_end")
-            
-            #prev_strtoken = strtoken
-            prev_content = content
-        # end the starting range after last loop iteration
-        self.mainframe.TextArea.mark_set("range_end", END)
+            # delete this block if never happens
+            if not content:
+                print('no content in HighLight.tokens() loop')
+                continue
 
-        #self.mainframe.TextArea.mark_set("range_end", "range_start + %dc" % len(content))
-        #self.mainframe.TextArea.tag_add(str(token), "range_start", "range_end")
-        #self.mainframe.TextArea.mark_set("range_start", "range_end")
-        
+            #strtoken == 'Token.Literal.String.Doc' \
+            if self.mainframe.texthelper.visible(self.mainframe.TextArea, '1.0 + %dc' % i) \
+            or self.mainframe.texthelper.visible(self.mainframe.TextArea, '1.0 + %dc' % (i+lencontent)):
+                strtoken = str(token)
+                self.mainframe.TextArea.mark_set("range_start", "1.0 + %dc" %i )
+                self.mainframe.TextArea.mark_set("range_end", "range_start + %dc" % lencontent)
+                self.mainframe.TextArea.tag_add(strtoken, "range_start", "range_end")
+
+            i += lencontent
+
         self.prevdata = data
