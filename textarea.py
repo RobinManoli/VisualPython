@@ -51,7 +51,7 @@ class TextArea(Text):
 
     def on_enter(self, event=None):
         # unhilight whitespace
-        self.mainframe.HighLight.clear_whitespace(event)
+        self.mainframe.HighLight.clear_whitespace()
 
     def on_return(self, event=None):
         "Create indentation for new lines (same as above line)"

@@ -49,10 +49,8 @@ class HighLight():
             self.mainframe.TextArea.tag_remove(tag, SEL_FIRST, SEL_LAST)
             
 
-    def clear_whitespace(self, event=None):
-        for tag in self.mainframe.TextArea.tag_names():
-            if tag.startswith('Token.Text.Whitespace.'):
-                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
+    def clear_whitespace(self):
+        self.clear('Token.Text.Whitespace.')
 
     def whitespace( self, event=None ):
         tv = self.mainframe.texthelper.top_visible(self.mainframe.TextArea)
@@ -77,10 +75,8 @@ class HighLight():
             self.mainframe.TextArea.mark_set("range_end", 'range_start + 1 c')
             self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
     
-    def clear_brackets(self, event=None):
-        for tag in self.mainframe.TextArea.tag_names():
-            if tag.startswith('Bracket.'):
-                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
+    def clear_brackets(self):
+        self.clear('Bracket.')
 
     def brackets(self, event=None):
         self.clear_brackets()
@@ -148,13 +144,10 @@ class HighLight():
                     self.mainframe.TextArea.tag_add(tag, mark.replace('range_end_', 'range_start_'), mark)
 
 
-    def clear_tokens(self, event=None):
-        for tag in self.mainframe.TextArea.tag_names():
-            # although only Token.Literal.String.Doc gets messed up, to fix this I've only found (inefficiently) removing all token tags to work
-            # do not remove SEL "sel" tags
-            if tag.startswith('Token.'):
-                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
+    def clear_tokens(self):
+        # although only Token.Literal.String.Doc gets messed up, to fix this I've only found (inefficiently) removing all token tags to work
         #self.mainframe.TextArea.tag_remove('Token.Literal.String.Doc', 1.0, END) # failed to fix (editing ending chars of) multiline string bug
+        self.clear('Token.')
 
     def tokens(self, event=None):
         # http://stackoverflow.com/a/30199105
