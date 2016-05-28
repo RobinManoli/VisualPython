@@ -21,6 +21,7 @@ class TextArea(Text):
         self.bind('<Shift-Tab>', self.on_shift_tab)
         self.bind('<ButtonRelease-1>', self.after_click)
         self.bind('<Double-Button-1>', self.on_dclick)
+        # bind triple click because otherwise dclick "break" returnage seems to untrigger default behaviour
         self.bind('<Triple-Button-1>', lambda: True)
         
     def scrollY(self, action, position, type=None):
