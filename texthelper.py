@@ -42,3 +42,9 @@ class Line():
         self.text = widget.get(self.start, self.end)
         self.indent = indent(self.text)
 
+def get_selection(widget):
+    try:
+        return widget.get(SEL_FIRST, SEL_LAST)
+    except TclError:
+        # there is no selection
+        return ''

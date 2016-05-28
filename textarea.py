@@ -2,7 +2,8 @@ from tkinter import *
 
 class TextArea(Text):
     def __init__(self, parent):
-        Text.__init__(self, parent, wrap=WORD, yscrollcommand=self.scrollYUpdate, padx=5, pady=5, undo=True, maxundo=-1)
+        Text.__init__(self, parent, wrap=WORD, yscrollcommand=self.scrollYUpdate,
+            padx=5, pady=5, undo=True, maxundo=-1, selectforeground='black',selectbackground="#ccccff")
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
@@ -11,13 +12,14 @@ class TextArea(Text):
 
     def init(self):
         #self.bind('<<Modified>>', self.changed) # works only once
-        self.bind('<KeyRelease>', self.changed)
+        self.bind('<KeyRelease>', self.on_key_release)
         self.bind('<Motion>', self.on_motion)
         self.bind('<Enter>', self.on_enter)
         self.bind('<Leave>', self.on_leave)
         self.bind('<Return>', self.on_return)
         self.bind('<Tab>', self.on_tab)
         self.bind('<Shift-Tab>', self.on_shift_tab)
+        self.bind('<ButtonRelease-1>', self.after_click)
         self.bind('<Double-Button-1>', self.on_dclick)
         
     def scrollY(self, action, position, type=None):
@@ -31,14 +33,16 @@ class TextArea(Text):
         self.mainframe.scrollbarY.set(first, last)
         self.mainframe.HighLight.tokens('scrollYUpdate')
 
-    def changed(self, event=None):
+    def on_key_release(self, event=None):
         #print(repr(event.char))
         #if event and event.char == '\r': # example to detect keypress return during anykepress
         self.mainframe.LineTools.update_linenumbers(event)
         self.mainframe.HighLight.tokens(event)
+        self.mainframe.HighLight.same(event)
 
     def on_motion(self, event=None):
         self.mainframe.HighLight.brackets(event)
+        self.mainframe.HighLight.same(event)
 
     def on_leave(self, event=None):
         # hilight whitespace
@@ -84,6 +88,9 @@ class TextArea(Text):
                     break
         return "break"
 
+    def after_click(self, event=None):
+        self.mainframe.HighLight.same(event)
+
     def on_dclick(self, event=None):
         char = self.get(INSERT, 'insert + 1c')
         if not char.strip():
@@ -102,5 +109,7 @@ class TextArea(Text):
         self.tag_add(SEL, "%d.%d" % (line.n,start), "%d.%d" % (line.n,end))
         # hide hilighted brackets when dclick selecting text
         self.mainframe.HighLight.clear_brackets()
+
+        self.mainframe.HighLight.same(event)
         return "break"
         

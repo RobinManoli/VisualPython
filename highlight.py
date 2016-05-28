@@ -7,56 +7,47 @@ class HighLight():
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
+        
+        self.last_same = ''
 
         self.init()
 
-    def init(self):
-        self.prevdata = ''
-        self.mainframe.TextArea.tag_configure("Token.Keyword", foreground="#CC7A00")
-        self.mainframe.TextArea.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
-        self.mainframe.TextArea.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
-        self.mainframe.TextArea.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
-        self.mainframe.TextArea.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
-        self.mainframe.TextArea.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
-        self.mainframe.TextArea.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+    def clear(self, prefix=''):
+        "Clears tags that start with prefix. Should be able to replace the other clear_ members of this class."
+        for tag in self.mainframe.TextArea.tag_names():
+            if tag.startswith(prefix):
+                self.mainframe.TextArea.tag_remove(tag, 1.0, END)
 
-        self.mainframe.TextArea.tag_configure("Token.Name.Class", foreground="#003D99")
-        self.mainframe.TextArea.tag_configure("Token.Name.Exception", foreground="#003D99")
-        self.mainframe.TextArea.tag_configure("Token.Name.Function", foreground="#003D99")
-        self.mainframe.TextArea.tag_configure("Token.Name.Namespace", foreground="#003D99")
-        self.mainframe.TextArea.tag_configure("Token.Name.Builtin.Pseudo", foreground="#003D99")
+    def same(self, event=None):
+        tag = 'Same'
+        sel = self.mainframe.texthelper.get_selection(self.mainframe.TextArea)
+        "Highlights visible text that is the same as the current selection."
+        
+        if sel != self.last_same:
+            self.clear(tag)
+        self.last_same = sel
 
-        self.mainframe.TextArea.tag_configure("Token.Comment", foreground="#B80000")
-        self.mainframe.TextArea.tag_configure("Token.Comment.Single", foreground="#B80000")
-        self.mainframe.TextArea.tag_configure("Token.Comment.Hashbang", foreground="#B80000")
+        if not sel:
+            return
 
-        self.mainframe.TextArea.tag_configure("Token.Literal.String", foreground="#248F24")
-        self.mainframe.TextArea.tag_configure("Token.Literal.String.Double", foreground="#248F24")
-        self.mainframe.TextArea.tag_configure("Token.Literal.String.Single", foreground="#248F24")
-        self.mainframe.TextArea.tag_configure("Token.Literal.String.Doc", foreground="#248F24")
+        tv = self.mainframe.texthelper.top_visible(self.mainframe.TextArea)
+        bv = self.mainframe.texthelper.bottom_visible(self.mainframe.TextArea)
+        content = self.mainframe.TextArea.get(tv, bv)
 
-        #self.mainframe.TextArea.tag_configure("Token.Text", foreground="#248F24", background="#eeeeee")
-        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Leading0", foreground="#248F24", background="#ccffcc")
-        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Leading1", foreground="#248F24", background="#ccffff")
-        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Leading2", foreground="#248F24", background="#ccccff")
-        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Newline", foreground="#248F24", background="#dddddd")
-        #self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Trailing", foreground="#248F24", background="#eeeeee")
+        from re import finditer, escape
+        # list occurences of selection in visible content
+        # http://stackoverflow.com/a/4664889
+        occurrences = [m.start() for m in finditer(escape(sel), content)]
+        
+        if occurrences:
+            for pos in occurrences:
+                self.mainframe.TextArea.mark_set("range_start", tv + ' + %dc' % pos)
+                self.mainframe.TextArea.mark_set("range_end", 'range_start + %dc' % len(sel))
+                self.mainframe.TextArea.tag_add(tag, "range_start", "range_end")
 
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket1", foreground="#ffffff", background="#000000")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket2", foreground="#ffffff", background="#555555")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket3", foreground="#000000", background="#999999")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket4", foreground="#000000", background="#cccccc")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket5", foreground="#ffffff", background="#000000")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket6", foreground="#ffffff", background="#555555")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket7", foreground="#000000", background="#999999")
-        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket8", foreground="#000000", background="#cccccc")
-
-        #self.mainframe.TextArea.tag_configure("Token.Punctuation", foreground="#248F24", background="#eeeeee")
-        #self.mainframe.TextArea.tag_configure("Token.Operator", foreground="#248F24", background="#eeeeee")
-        self.mainframe.TextArea.tag_configure("Token.Operator.Word", foreground="#CC7A00")
-
-    #def index_is_visible(self, index):
-    #    return bool( self.mainframe.TextArea.bbox(index) )
+            # remove same highlighting from actual selection
+            self.mainframe.TextArea.tag_remove(tag, SEL_FIRST, SEL_LAST)
+            
 
     def clear_whitespace(self, event=None):
         for tag in self.mainframe.TextArea.tag_names():
@@ -99,7 +90,7 @@ class HighLight():
             # no selection rasies TclError
             self.mainframe.TextArea.index(SEL_FIRST)
             if line.n == self.mainframe.TextArea.index(SEL_FIRST).split('.')[0] or line.n == self.mainframe.TextArea.index(SEL_LAST).split('.')[0]:
-                # fix invisible selection when selecting highlighted brackets by not highlighting during selection on that line
+                # skip highlighting brackets when selecting text on that line (because otherwise the selected text is not visible)
                 return
         except TclError:
             #print('no selection')
@@ -203,3 +194,51 @@ class HighLight():
             i += lencontent
 
         self.prevdata = data
+
+    def init(self):
+        self.prevdata = ''
+        self.mainframe.TextArea.tag_configure("Token.Keyword", foreground="#CC7A00")
+        self.mainframe.TextArea.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
+        self.mainframe.TextArea.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
+        self.mainframe.TextArea.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
+        self.mainframe.TextArea.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
+        self.mainframe.TextArea.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
+        self.mainframe.TextArea.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+
+        self.mainframe.TextArea.tag_configure("Token.Name.Class", foreground="#003D99")
+        self.mainframe.TextArea.tag_configure("Token.Name.Exception", foreground="#003D99")
+        self.mainframe.TextArea.tag_configure("Token.Name.Function", foreground="#003D99")
+        self.mainframe.TextArea.tag_configure("Token.Name.Namespace", foreground="#003D99")
+        self.mainframe.TextArea.tag_configure("Token.Name.Builtin.Pseudo", foreground="#003D99")
+
+        self.mainframe.TextArea.tag_configure("Token.Comment", foreground="#B80000")
+        self.mainframe.TextArea.tag_configure("Token.Comment.Single", foreground="#B80000")
+        self.mainframe.TextArea.tag_configure("Token.Comment.Hashbang", foreground="#B80000")
+
+        self.mainframe.TextArea.tag_configure("Token.Literal.String", foreground="#248F24")
+        self.mainframe.TextArea.tag_configure("Token.Literal.String.Double", foreground="#248F24")
+        self.mainframe.TextArea.tag_configure("Token.Literal.String.Single", foreground="#248F24")
+        self.mainframe.TextArea.tag_configure("Token.Literal.String.Doc", foreground="#248F24")
+
+        #self.mainframe.TextArea.tag_configure("Token.Text", foreground="#248F24", background="#eeeeee")
+        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Leading0", foreground="#248F24", background="#ccffcc")
+        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Leading1", foreground="#248F24", background="#ccffff")
+        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Leading2", foreground="#248F24", background="#ccccff")
+        self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Newline", foreground="#248F24", background="#dddddd")
+        #self.mainframe.TextArea.tag_configure("Token.Text.Whitespace.Trailing", foreground="#248F24", background="#eeeeee")
+
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket1", foreground="#ffffff", background="#000000")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket2", foreground="#ffffff", background="#555555")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket3", foreground="#000000", background="#999999")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket4", foreground="#000000", background="#cccccc")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket5", foreground="#ffffff", background="#000000")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket6", foreground="#ffffff", background="#555555")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket7", foreground="#000000", background="#999999")
+        self.mainframe.TextArea.tag_configure("Bracket.Token.Punctuation.Bracket8", foreground="#000000", background="#cccccc")
+
+        self.mainframe.TextArea.tag_configure("Same", background="#ffff00")
+
+        #self.mainframe.TextArea.tag_configure("Token.Punctuation", foreground="#248F24", background="#eeeeee")
+        #self.mainframe.TextArea.tag_configure("Token.Operator", foreground="#248F24", background="#eeeeee")
+        self.mainframe.TextArea.tag_configure("Token.Operator.Word", foreground="#CC7A00")
+

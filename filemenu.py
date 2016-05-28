@@ -27,7 +27,7 @@ class FileMenu(Menu):
         #print( self.mainframe.f )
         self.mainframe.TextArea.delete(1.0, END)
         self.mainframe.TextArea.insert(1.0, self.mainframe.f.read())
-        self.mainframe.TextArea.changed()
+        self.mainframe.TextArea.on_key_release()
         
 
     def write(self):
