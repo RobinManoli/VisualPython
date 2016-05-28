@@ -88,8 +88,9 @@ class HighLight():
 
         try:
             # no selection rasies TclError
-            self.mainframe.TextArea.index(SEL_FIRST)
-            if line.n == self.mainframe.TextArea.index(SEL_FIRST).split('.')[0] or line.n == self.mainframe.TextArea.index(SEL_LAST).split('.')[0]:
+            sel_first = self.mainframe.texthelper.Line(self.mainframe.TextArea, SEL_FIRST)
+            sel_last = self.mainframe.texthelper.Line(self.mainframe.TextArea, SEL_LAST)
+            if line.n in (sel_first.n, sel_last.n):
                 # skip highlighting brackets when selecting text on that line (because otherwise the selected text is not visible)
                 return
         except TclError:

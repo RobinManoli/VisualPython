@@ -38,6 +38,7 @@ class TextArea(Text):
         #if event and event.char == '\r': # example to detect keypress return during anykepress
         self.mainframe.LineTools.update_linenumbers(event)
         self.mainframe.HighLight.tokens(event)
+        self.mainframe.HighLight.brackets(event)
         self.mainframe.HighLight.same(event)
 
     def on_motion(self, event=None):
