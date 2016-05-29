@@ -7,9 +7,6 @@ Known bugs (TODO):
     - if scroll down to hide top content, then resize window down and then maximize top content into view, it doesn't get highlighted
 
 Next features (todo):
-    - make linetools and textarea linked together, one instance for each tab (instance of being global Texts)
-    - each editor might have a highlighter, if needing to remember things when switching tabs, otherwise it may take the textarea as a parameter
-    - create editor which contains linetools and textarea
     - tabs for multiple opened files
 """
 
@@ -17,8 +14,6 @@ from tkinter import *
 import filemenu
 import notebook
 import texthelper
-import editor
-import highlight
 
 class MainFrame(Frame):
     "The main container (Frame) of the program."
@@ -35,30 +30,20 @@ class MainFrame(Frame):
 
         self.menu = Menu(self)
         self.root.config(menu=self.menu)
-        self.FileMenu = filemenu.FileMenu(self)
+        self.filemenu = filemenu.FileMenu(self)
 
-        #self.NoteBook = notebook.NoteBook(self)
-        self.editor = editor.Editor(self)
-        self.HighLight = highlight.HighLight(self)
-
-        self.editor.pack(side=LEFT, fill=BOTH, expand=True)
-        #self.NoteBook.pack(side=LEFT, fill=BOTH, expand=True)
-
-        scrollbarY = Scrollbar(self)
-        scrollbarY.pack(side=RIGHT, fill=Y)
-        scrollbarY.config(command=self.TextArea.scrollY)
-        self.scrollbarY = scrollbarY
-        
+        self.notebook = notebook.NoteBook(self)
+        self.notebook.pack(side=LEFT, fill=BOTH, expand=True)
 
         import sys
-        if len( sys.argv ) > 1:
+        if len( sys.argv ) > 1 and False:
             # auto-open file at startup (after inits)
             # something is not ready when auto-opening, resulting in for example multiline-counter being messed up
             # though fixed with update
             self.root.update()
-            self.FileMenu.open( sys.argv[1] )
+            self.filemenu.open( sys.argv[1] )
         else:
-            self.NoteBook.new_tab()
+            self.notebook.new_tab()
 
         #self.root.wait_visibility(self.textarea) # FREEZES
         #self.root.wait_window(self.textarea) # never happens

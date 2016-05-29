@@ -23,20 +23,18 @@ class FileMenu(Menu):
         self.root.bind_all('<Control-s>', self.write)
 
     def open(self, fname):
-        self.mainframe.f = open(fname, 'r+')
-        #print( self.mainframe.f )
-        self.mainframe.TextArea.delete(1.0, END)
-        self.mainframe.TextArea.insert(1.0, self.mainframe.f.read())
-        self.mainframe.TextArea.on_key_release()
-        
+        return open(fname, 'r+')
 
-    def write(self):
+    def write(self, event=None):
         # http://stackoverflow.com/questions/2424000/read-and-overwrite-a-file-in-python
-        content = self.mainframe.TextArea.get(1.0, 'end - 1c')
-        self.mainframe.f.seek(0)
-        self.mainframe.f.write(content)
-        self.mainframe.f.truncate()
-        #self.mainframe.f.close()
+        index = self.mainframe.notebook.index( self.mainframe.notebook.select() )
+        editor = self.mainframe.notebook.editors[index]
+
+        content = editor.textarea.get(1.0, 'end - 1c')
+        editor.f.seek(0)
+        editor.f.write(content)
+        editor.f.truncate()
+        #editor.f.close()
 
     def load(self, event=None):
         fname = askopenfilename(filetypes=(
@@ -45,7 +43,7 @@ class FileMenu(Menu):
             ("HTML files", "*.html;*.htm"),
         ))
         if fname:
-            self.open(fname)
+            self.mainframe.notebook.new_tab(fname)
 
 
     def save(self):

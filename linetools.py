@@ -74,7 +74,7 @@ class LineTools(Text):
         linenumbers = linenumbers[:-1]
 
         # fix unwanted scrolling when inserting linenumbers
-        sbstatus = self.mainframe.scrollbarY.get()
+        sbstatus = self.textarea.scrollbarY.get()
         self.config(state=NORMAL)
         self.delete(1.0, END)
         self.insert(1.0, linenumbers)

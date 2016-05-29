@@ -7,6 +7,7 @@ class TextArea(Text):
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
+        self.scrollbarY = parent.scrollbarY
         
         self.init()
 
@@ -32,28 +33,28 @@ class TextArea(Text):
         # http://stackoverflow.com/a/37087317
         self.yview_moveto(first)
         self.linetools.yview_moveto(first)
-        self.mainframe.scrollbarY.set(first, last)
-        self.mainframe.HighLight.tokens('scrollYUpdate')
+        self.scrollbarY.set(first, last)
+        self.highlight.tokens('scrollYUpdate')
 
     def on_key_release(self, event=None):
         #print(repr(event.char))
         #if event and event.char == '\r': # example to detect keypress return during anykepress
         self.linetools.update_linenumbers(event)
-        self.mainframe.HighLight.tokens(event)
-        self.mainframe.HighLight.brackets(event)
-        self.mainframe.HighLight.same(event)
+        self.highlight.tokens(event)
+        self.highlight.brackets(event)
+        self.highlight.same(event)
 
     def on_motion(self, event=None):
-        self.mainframe.HighLight.brackets(event)
-        self.mainframe.HighLight.same(event)
+        self.highlight.brackets(event)
+        self.highlight.same(event)
 
     def on_leave(self, event=None):
         # hilight whitespace
-        self.mainframe.HighLight.whitespace(event)
+        self.highlight.whitespace(event)
 
     def on_enter(self, event=None):
         # unhilight whitespace
-        self.mainframe.HighLight.clear_whitespace()
+        self.highlight.clear_whitespace()
 
     def on_return(self, event=None):
         "Create indentation for new lines (same as above line)"
@@ -92,7 +93,7 @@ class TextArea(Text):
         return "break"
 
     def after_click(self, event=None):
-        self.mainframe.HighLight.same(event)
+        self.highlight.same(event)
 
     def on_dclick(self, event=None):
         char = self.get(INSERT, 'insert + 1c')
@@ -111,8 +112,8 @@ class TextArea(Text):
 
         self.tag_add(SEL, "%d.%d" % (line.n,start), "%d.%d" % (line.n,end))
         # hide hilighted brackets when dclick selecting text
-        self.mainframe.HighLight.clear_brackets()
+        self.highlight.clear_brackets()
 
-        self.mainframe.HighLight.same(event)
+        self.highlight.same(event)
         return "break"
         
