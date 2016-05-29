@@ -9,6 +9,7 @@ class LineTools(Text):
         self.mainframe = parent.mainframe
         self.root = parent.root
         self.textarea = textarea
+        self.textarea.linetools = self
 
         self.last_motion_index = ''
 

@@ -17,8 +17,7 @@ from tkinter import *
 import filemenu
 import notebook
 import texthelper
-import textarea
-import linetools
+import editor
 import highlight
 
 class MainFrame(Frame):
@@ -39,13 +38,11 @@ class MainFrame(Frame):
         self.FileMenu = filemenu.FileMenu(self)
 
         #self.NoteBook = notebook.NoteBook(self)
-        self.TextArea = textarea.TextArea(self)
-        self.LineTools = linetools.LineTools(self, self.TextArea)
+        self.editor = editor.Editor(self)
         self.HighLight = highlight.HighLight(self)
 
-        self.LineTools.pack(side=LEFT, fill=Y)
+        self.editor.pack(side=LEFT, fill=BOTH, expand=True)
         #self.NoteBook.pack(side=LEFT, fill=BOTH, expand=True)
-        self.TextArea.pack(side=LEFT, fill=BOTH, expand=True)
 
         scrollbarY = Scrollbar(self)
         scrollbarY.pack(side=RIGHT, fill=Y)
