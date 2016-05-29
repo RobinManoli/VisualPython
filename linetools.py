@@ -3,11 +3,12 @@ from tkinter import *
 class LineTools(Text):
     """
     """
-    def __init__(self, parent):
-        Text.__init__(self, parent, state=DISABLED, wrap=NONE, yscrollcommand=parent.mainframe.TextArea.scrollYUpdate, width=5, padx=5, pady=5, relief=FLAT)
+    def __init__(self, parent, textarea):
+        Text.__init__(self, parent, state=DISABLED, wrap=NONE, yscrollcommand=textarea.scrollYUpdate, width=5, padx=5, pady=5, relief=FLAT)
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
+        self.textarea = textarea
 
         self.last_motion_index = ''
 
@@ -40,27 +41,27 @@ class LineTools(Text):
             # textarea wrapped lines are newlines in linetools, so find the closest above written line number
             toolline = self.mainframe.texthelper.Line(self, toolline.n - 1)
         neditorline = int(toolline.text.rstrip('#'))
-        editorline = self.mainframe.texthelper.Line(self.mainframe.TextArea, neditorline)
+        editorline = self.mainframe.texthelper.Line(self.textarea, neditorline)
 
         if not editorline.text:
             return
 
         #while not self.mainframe.TextArea.get(start, start + '+ 1c').lstrip():
         if editorline.text.lstrip().startswith('#'):
-            self.mainframe.TextArea.delete(editorline.start + ' + %dc' % len(editorline.indent), editorline.start + '+ %dc + 1c' % len(editorline.indent))
+            self.textarea.delete(editorline.start + ' + %dc' % len(editorline.indent), editorline.start + '+ %dc + 1c' % len(editorline.indent))
         else:
-            self.mainframe.TextArea.insert(editorline.start + ' + %dc' % len(editorline.indent), '#')
+            self.textarea.insert(editorline.start + ' + %dc' % len(editorline.indent), '#')
 
     def update_linenumbers(self, event=None):
         # get content, but don't include the last newline inserted by tkinter
-        content = self.mainframe.TextArea.get(1.0, "end-1c")
+        content = self.textarea.get(1.0, "end-1c")
         linenumbers = ''
-        width = self.mainframe.TextArea.cget('width')
+        width = self.textarea.cget('width')
         for i, text in enumerate(content.split('\n')):
             linenumbers += str(i+1)
             linenumbers += '\n'
-            bbox_first_char = self.mainframe.TextArea.bbox("%d.0" % (i+1))
-            bbox_last_char = self.mainframe.TextArea.bbox("%d.0 - 1c" % (i+2))
+            bbox_first_char = self.textarea.bbox("%d.0" % (i+1))
+            bbox_last_char = self.textarea.bbox("%d.0 - 1c" % (i+2))
             if bbox_first_char and bbox_last_char:
                 wrapped_line_height = bbox_last_char[1] - bbox_first_char[1]
                 unwrapped_line_height = bbox_first_char[3]
@@ -80,4 +81,4 @@ class LineTools(Text):
         # sbstatus can for some reason not be retrieved when auto-open files at start
         if len(sbstatus) == 2:
             sbfirst, sblast = sbstatus
-            self.mainframe.TextArea.scrollYUpdate(sbfirst, sblast)
+            self.textarea.scrollYUpdate(sbfirst, sblast)
