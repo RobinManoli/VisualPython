@@ -22,5 +22,13 @@ class NoteBook(Notebook):
         else:
             fname = 'new'
             f = None
-        self.editors.append(editor.Editor(self, fname, f))
-        self.add(self.editors[-1], text=fname)
+        ed = editor.Editor(self, fname, f)
+        self.editors.append(ed)
+        self.add(ed, text=fname)
+        # switch to newly opened tab
+        index = self.editors.index(ed)
+        self.select(index)
+
+    def current_editor(self):
+        index = self.index( self.select() )
+        return self.editors[index]

@@ -27,8 +27,7 @@ class FileMenu(Menu):
 
     def write(self, event=None):
         # http://stackoverflow.com/questions/2424000/read-and-overwrite-a-file-in-python
-        index = self.mainframe.notebook.index( self.mainframe.notebook.select() )
-        editor = self.mainframe.notebook.editors[index]
+        editor = self.mainframe.notebook.current_editor()
 
         content = editor.textarea.get(1.0, 'end - 1c')
         editor.f.seek(0)
