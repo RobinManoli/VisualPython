@@ -8,6 +8,7 @@ class TextArea(Text):
         self.mainframe = parent.mainframe
         self.root = parent.root
         self.scrollbarY = parent.scrollbarY
+        self.texthelper = self.mainframe.texthelper
         
         self.init()
 
@@ -25,6 +26,7 @@ class TextArea(Text):
         # bind triple click because otherwise dclick "break" returnage seems to untrigger default behaviour
         self.bind('<Triple-Button-1>', lambda event: True)
         self.bind('<Control-o>', self.mainframe.filemenu.load)
+        self.bind('<Home>', self.on_home)
 
     def scrollY(self, action, position, type=None):
         self.yview_moveto(position)
@@ -91,6 +93,15 @@ class TextArea(Text):
                     self.insert(line.start, line2.indent)
                     #print( repr(line2.indent) )
                     break
+        return "break"
+
+    def on_home(self, event=None):
+        line = self.texthelper.Line(self)
+        if line.column == len(line.indent):
+            # INSERT is at end of indent, so do default move to beginning of line
+            return
+        # move to end of indent
+        self.mark_set("insert", "%d.%d" % (line.n, len(line.indent)))
         return "break"
 
     def after_click(self, event=None):

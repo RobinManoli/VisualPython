@@ -18,6 +18,11 @@ def linenumber(widget, index=INSERT):
     nline = int( index.split('.')[0] )
     return nline
 
+def column(widget, index=INSERT):
+    index = widget.index(index)
+    col = int( index.split('.')[1] )
+    return col    
+
 def visible(widget, index):
     return bool( widget.bbox(index) )
 
@@ -34,8 +39,10 @@ class Line():
         integer = 1
         if type(index) == type(integer):
             self.n = index
+            self.column = 0
         else:
             self.n = linenumber(widget, index)
+            self.column = column(widget, index)
         # todo: self.column
         self.start = "%d.0" % self.n
         self.end = "%d.end" % self.n
