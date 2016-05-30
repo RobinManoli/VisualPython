@@ -7,7 +7,8 @@ Known bugs (TODO):
     - if scroll down to hide top content, then resize window down and then maximize top content into view, it doesn't get highlighted
 
 Next features (todo):
-    - tabs for multiple opened files
+    - create new file
+    - if editor is too slow with multiple tabs, try to only have one mainframe.textarea, and make editors keep text contents only
 """
 
 from tkinter import *
@@ -43,7 +44,7 @@ class MainFrame(Frame):
             self.root.update()
             self.filemenu.open( sys.argv[1] )
         else:
-            self.notebook.new_tab()
+            self.notebook.new_editor()
 
         #self.root.wait_visibility(self.textarea) # FREEZES
         #self.root.wait_window(self.textarea) # never happens

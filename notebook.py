@@ -14,7 +14,7 @@ class NoteBook(Notebook):
 
         self.editors = []
 
-    def new_tab(self, fpathname=''):
+    def new_editor(self, fpathname=''):
         if fpathname:
             fname = fpathname
             f = self.mainframe.filemenu.open( fpathname )

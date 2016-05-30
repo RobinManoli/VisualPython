@@ -42,7 +42,7 @@ class FileMenu(Menu):
             ("HTML files", "*.html;*.htm"),
         ))
         if fname:
-            self.mainframe.notebook.new_tab(fname)
+            self.mainframe.notebook.new_editor(fname)
 
 
     def save(self):
