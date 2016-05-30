@@ -34,6 +34,7 @@ class FileMenu(Menu):
         editor.f.write(content)
         editor.f.truncate()
         #editor.f.close()
+        return "break"
 
     def load(self, event=None):
         fname = askopenfilename(filetypes=(
@@ -43,6 +44,7 @@ class FileMenu(Menu):
         ))
         if fname:
             self.mainframe.notebook.new_editor(fname)
+        return "break"
 
 
     def save(self):

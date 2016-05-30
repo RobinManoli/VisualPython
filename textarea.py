@@ -24,7 +24,8 @@ class TextArea(Text):
         self.bind('<Double-Button-1>', self.on_dclick)
         # bind triple click because otherwise dclick "break" returnage seems to untrigger default behaviour
         self.bind('<Triple-Button-1>', lambda event: True)
-        
+        self.bind('<Control-o>', self.mainframe.filemenu.load)
+
     def scrollY(self, action, position, type=None):
         self.yview_moveto(position)
         self.linetools.yview_moveto(position)
