@@ -14,21 +14,27 @@ class NoteBook(Notebook):
 
         self.editors = []
 
+        self.bind('<ButtonRelease-1>', self.after_click)
+
     def new_editor(self, fpathname=''):
-        if fpathname:
-            fname = fpathname
-            f = self.mainframe.filemenu.open( fpathname )
-            
-        else:
-            fname = 'new'
-            f = None
-        ed = editor.Editor(self, fname, f)
+        ed = editor.Editor(self, fpathname)
         self.editors.append(ed)
-        self.add(ed, text=fname)
+        self.add(ed)
         # switch to newly opened tab
         index = self.editors.index(ed)
         self.select(index)
+        self.after_click()
 
     def current_editor(self):
         index = self.index( self.select() )
         return self.editors[index]
+
+    def after_click(self, event=None):
+        current = self.current_editor()
+        for ed in self.editors:
+            i = self.editors.index(ed)
+            if current == ed:
+                # fpathname exists only on saved files
+                self.tab(i, text=ed.fpathname or ed.fname)
+            else:
+                self.tab(i, text=ed.fname)

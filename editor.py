@@ -4,15 +4,16 @@ import linetools
 import highlight
 
 class Editor(Frame):
-    def __init__(self, parent, fname, f):
+    def __init__(self, parent, fpathname):
         Frame.__init__(self, parent)
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
         
-        self.fname = fname
-        self.f = f
-        
+        self.fpathname = fpathname
+        self.f = self.mainframe.filemenu.open( fpathname ) if fpathname else None
+        from os import path
+        self.fname = path.basename(fpathname) if fpathname else 'new'
         self.scrollbarY = Scrollbar(self)
         self.textarea = textarea.TextArea(self)
         self.linetools = linetools.LineTools(self, self.textarea)
@@ -26,5 +27,6 @@ class Editor(Frame):
         #print( self.mainframe.f )
         #self.textarea.delete(1.0, END)
         if self.f:
-            self.textarea.insert(1.0, f.read())
+            self.textarea.insert(1.0, self.f.read())
             self.textarea.on_key_release()
+
