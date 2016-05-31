@@ -1,4 +1,7 @@
-from tkinter import *
+try:
+    from tkinter import *
+except:
+    from Tkinter import *
 import textarea
 import linetools
 import highlight

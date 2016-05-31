@@ -1,4 +1,7 @@
-from tkinter import *
+try:
+    from tkinter import *
+except:
+    from Tkinter import *
 
 class TextArea(Text):
     def __init__(self, parent):

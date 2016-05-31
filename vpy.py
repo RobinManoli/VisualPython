@@ -11,7 +11,10 @@ Next features (todo):
     - if editor is too slow with multiple tabs, try to only have one mainframe.textarea, and make editors keep text contents only
 """
 
-from tkinter import *
+try:
+    from tkinter import *
+except:
+    from Tkinter import *
 import filemenu
 import notebook
 import texthelper
@@ -51,7 +54,11 @@ class MainFrame(Frame):
         #self.root.update_idletasks()
 
     def maximize(self):
-        self.root.state('zoomed')
+        try:
+            # windows only? at least not lubuntu
+            self.root.state('zoomed')
+        except:
+            pass
 
 
 def print_exception(e):

@@ -1,4 +1,7 @@
-from tkinter import *
+try:
+    from tkinter import *
+except:
+    from Tkinter import *
 
 class HighLight():
     """
@@ -176,9 +179,9 @@ class HighLight():
         for token, content in lex(data, PythonLexer()):
             lencontent = len(content)
 
-            # delete this block if never happens
+            # this happens sometimes in lubuntu
             if not content:
-                print('no content in HighLight.tokens() loop')
+                #print('no content in HighLight.tokens() loop')
                 continue
 
             #str(token) == 'Token.Literal.String.Doc' \

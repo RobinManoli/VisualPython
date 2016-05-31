@@ -1,5 +1,9 @@
-from tkinter import *
-from tkinter.ttk import Notebook
+try:
+    from tkinter import *
+    from tkinter.ttk import Notebook
+except:
+    from Tkinter import *
+    from ttk import Notebook
 import editor
 
 class NoteBook(Notebook):

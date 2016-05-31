@@ -1,6 +1,9 @@
 "Helpers for tkinter's Text widget."
 
-from tkinter import *
+try:
+    from tkinter import *
+except:
+    from Tkinter import *
 
 def indent(text):
     "Finds and returns the indentation of the beginning of text."

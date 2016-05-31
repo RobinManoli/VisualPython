@@ -1,5 +1,9 @@
-from tkinter import *
-from tkinter.filedialog import askopenfilename, asksaveasfilename
+try:
+    from tkinter import *
+    from tkinter.filedialog import askopenfilename, asksaveasfilename
+except:
+    from Tkinter import *
+    from tkFileDialog import askopenfilename, asksaveasfilename
 
 class FileMenu(Menu):
     """
