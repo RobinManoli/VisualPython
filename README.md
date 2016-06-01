@@ -7,7 +7,7 @@ Proof of concept editor, visualizing Python code more than just keyword highligh
 ## Requirements
 - Python 2 or 3
 - Tkinter, ttk
-- Pygments (tested 2.1.3)
+- Pygments (tested v2.1.3)
 
 ## Features
 - highlights (nested) brackets - ()[]{}<> - when hovering the mouse cursor over them.
