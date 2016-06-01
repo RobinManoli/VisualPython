@@ -42,14 +42,17 @@ class LineNumbers(Canvas):
         index = self.textarea.index(coords)
 
         line = self.textarea.texthelper.Line(self.textarea, index)
-        if not line.text:
+        if not line.text or line.text.lstrip().startswith('##'):
             return
 
         #while not self.mainframe.TextArea.get(start, start + '+ 1c').lstrip():
         if line.text.lstrip().startswith('#'):
-            self.textarea.delete(line.start + ' + %dc' % len(line.indent), line.start + '+ %dc + 1c' % len(line.indent))
+            len_leading_whitespace_after_comment = len(line.text.lstrip()[1:]) - len(line.text.lstrip()[1:].lstrip())
+            start = line.start + ' + %dc' % len(line.indent)
+            end = line.start + '+ %dc + %dc' % (len(line.indent), len_leading_whitespace_after_comment + 1)
+            self.textarea.delete(start, end)
         else:
-            self.textarea.insert(line.start + ' + %dc' % len(line.indent), '#')
+            self.textarea.insert(line.start + ' + %dc' % len(line.indent), '# ')
 
     def draw(self, event=None):
         for item in self.linenumber_items:
