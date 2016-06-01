@@ -3,7 +3,8 @@ try:
 except:
     from Tkinter import *
 import textarea
-import linetools
+#import linetools
+import linenumbers
 import highlight
 
 class Editor(Frame):
@@ -19,10 +20,12 @@ class Editor(Frame):
         self.fname = path.basename(fpathname) if fpathname else 'new'
         self.scrollbarY = Scrollbar(self)
         self.textarea = textarea.TextArea(self)
-        self.linetools = linetools.LineTools(self, self.textarea)
+        #self.linetools = linetools.LineTools(self, self.textarea)
+        self.linenumbers = linenumbers.LineNumbers(self, self.textarea)
         self.highlight = highlight.HighLight(self, self.textarea)
 
-        self.linetools.pack(side=LEFT, fill=Y)
+        #self.linetools.pack(side=LEFT, fill=Y)
+        self.linenumbers.pack(side=LEFT, fill=Y)
         self.textarea.pack(side=LEFT, fill=BOTH, expand=True)
         self.scrollbarY.pack(side=RIGHT, fill=Y)
         self.scrollbarY.config(command=self.textarea.scrollY)

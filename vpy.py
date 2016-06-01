@@ -4,7 +4,6 @@
 """
 Known bugs (TODO):
     - on_tab and _shift_tab buggy, and visualizing tabs need to differ from spaces in color
-    - update linenumbers buggy when moving cursor to trailing whitespace with keys, and then moving cursor inside linetools area
     - if scroll down to hide top content, then resize window down and then maximize top content into view, it doesn't get highlighted
     - highlight.whitspace (line 74), string index out of range if i <= ... content[i+1]
 

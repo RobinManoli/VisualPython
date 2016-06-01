@@ -22,6 +22,8 @@ class LineTools(Text):
         self.bind('<Double-Button-1>', self.on_dclick)
 
     def on_motion(self, event=None):
+        if not self.get(1.0, END).strip():
+            return
         index = self.index(CURRENT)
         line = self.mainframe.texthelper.Line(self, index)
         
@@ -67,6 +69,13 @@ class LineTools(Text):
             self.textarea.insert(editorline.start + ' + %dc' % len(editorline.indent), '#')
 
     def update_linenumbers(self, event=None):
+        """
+        Write linenumbers corresponding to the lines in textarea.
+        Will not work with multilines, unless there is no wrap.
+        The reason is that there is no way to measure multilines that are not visible.
+        (It is possible with bbox for visible ones, but still a bit problematic.)
+        It might be possible however using the scrollbar to measure wrapped lines.
+        """
         # get content, but don't include the last newline inserted by tkinter
         content = self.textarea.get(1.0, "end-1c")
         # need to update_idletasks before bbox working, according to http://effbot.org/tkinterbook/text.htm#Tkinter.Text.bbox-method
@@ -87,7 +96,9 @@ class LineTools(Text):
                 # linenumbers += '\n' * (1 + int(len(text)/width))
             else:
                 # instead of update_idletasks(), to get bbox, redo this function after 100ms
-                self.after(100, self.update_linenumbers)
+                # todo BUG: doesn't work when cursor has gone outside visibility (ie on resize, since invisible should return None for bbox)
+                print(bbox_first_char, bbox_last_char)
+                #self.after(100, self.update_linenumbers)
                 return
 
         # remove last addition (of loop) of new line

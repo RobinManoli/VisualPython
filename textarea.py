@@ -33,22 +33,22 @@ class TextArea(Text):
 
     def scrollY(self, action, position, type=None):
         self.yview_moveto(position)
-        self.linetools.yview_moveto(position)
 
     def scrollYUpdate(self, first, last, type=None):
         # http://stackoverflow.com/a/37087317
         self.yview_moveto(first)
-        self.linetools.yview_moveto(first)
         self.scrollbarY.set(first, last)
         self.highlight.tokens('scrollYUpdate')
+        self.after(0, self.linenumbers.draw) # self.after makes this work on scroll (although delayed)
 
     def on_key_release(self, event=None):
-        #print(repr(event.char))
+        #if event:
+        #    print(repr(event.char))
         #if event and event.char == '\r': # example to detect keypress return during anykepress
-        self.linetools.update_linenumbers(event)
         self.highlight.tokens(event)
         self.highlight.brackets(event)
         self.highlight.same(event)
+        self.after(0, self.linenumbers.draw) # self.after makes this work on program start
 
     def on_motion(self, event=None):
         self.highlight.brackets(event)
