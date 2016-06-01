@@ -5,6 +5,7 @@ except:
 
 class HighLight():
     """
+    Highlights text in textarea.
     """
     def __init__(self, parent, textarea):
         self.parent = parent
@@ -19,7 +20,7 @@ class HighLight():
         self.init()
 
     def clear(self, prefix=''):
-        "Clears tags that start with prefix. Should be able to replace the other clear_ members of this class."
+        "Clears tags that start with prefix."
         for tag in self.textarea.tag_names():
             if tag.startswith(prefix):
                 self.textarea.tag_remove(tag, 1.0, END)
