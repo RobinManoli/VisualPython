@@ -25,9 +25,9 @@ class HighLight():
                 self.textarea.tag_remove(tag, 1.0, END)
 
     def same(self, event=None):
+        "Highlights visible text that is the same as the current selection."
         tag = 'Same'
         sel = self.mainframe.texthelper.get_selection(self.textarea)
-        "Highlights visible text that is the same as the current selection."
         
         if sel != self.last_same:
             self.clear(tag)

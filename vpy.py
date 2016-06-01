@@ -3,6 +3,7 @@
 
 """
 Known bugs (TODO):
+    - on_tab and _shift_tab buggy, and visualizing tabs need to differ from spaces in color
     - update linenumbers buggy when moving cursor to trailing whitespace with keys, and then moving cursor inside linetools area
     - if scroll down to hide top content, then resize window down and then maximize top content into view, it doesn't get highlighted
 
@@ -40,12 +41,12 @@ class MainFrame(Frame):
         self.notebook.pack(side=LEFT, fill=BOTH, expand=True)
 
         import sys
-        if len( sys.argv ) > 1 and False:
+        if len( sys.argv ) > 1:
             # auto-open file at startup (after inits)
             # something is not ready when auto-opening, resulting in for example multiline-counter being messed up
             # though fixed with update
             self.root.update()
-            self.filemenu.open( sys.argv[1] )
+            self.notebook.new_editor( sys.argv[1] )
         else:
             self.notebook.new_editor()
 
