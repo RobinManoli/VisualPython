@@ -16,27 +16,37 @@ class LineTools(Text):
 
         self.last_motion_index = ''
 
-        self.init()
+        self.tag_configure("CurrentLine", foreground="#000000", background="#ffff00")
 
-    def init(self):
         self.bind('<Motion>', self.on_motion)
         self.bind('<Double-Button-1>', self.on_dclick)
 
     def on_motion(self, event=None):
         index = self.index(CURRENT)
         line = self.mainframe.texthelper.Line(self, index)
-        if not line.text.strip():
-            return
-
+        
         if index != self.last_motion_index:
-            self.config(state=NORMAL)
-            if self.last_motion_index:
-                # delete # chars from last motion
-                nline0 = self.mainframe.texthelper.linenumber(self, self.last_motion_index)
-                self.delete('%d.end - 7c' % nline0, '%d.end' % nline0)
-            # add # chars at end of current line's motion
-            self.insert(line.end, ' ######')
-            self.config(state=DISABLED)
+            self.tag_remove('CurrentLine', 1.0, END)
+            if not line.text.strip():
+                # find above numbered line
+                i = 1
+                while not self.get('current - %dc' % i).strip():
+                    i += 1
+                start = self.mainframe.texthelper.Line(self, 'current - %dc' % i)
+            else:
+                start = line
+            if self.get('%d.end' % line.n, END).rstrip():
+                # there are non whitespace chars below CURRENT
+                j = 1
+                while not self.get('%d.end + %dc' % (line.n, j)).strip():
+                    j += 1
+                # move j back to last whitespace char
+                j -= 1
+                end = self.mainframe.texthelper.Line(self, '%d.end + %dc' % (line.n, j))
+            else:
+                end = line
+            # find below numbered line or end
+            self.tag_add('CurrentLine', '%d.0' % start.n, '%d.end + 1c' % end.n)
             self.last_motion_index = index
 
     def on_dclick(self, event=None):
