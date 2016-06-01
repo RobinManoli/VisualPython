@@ -74,28 +74,14 @@ class TextArea(Text):
         if self.get(line.start, INSERT).lstrip():
             # normal tab if cursor not in leading indentation
             return
-
-        # find nearest above line with lesser indentation
-        for i in range(line.n - 1, 1, -1):
-            line2 = self.mainframe.texthelper.Line(self, i)
-            if len(line.indent) < len(line2.indent):
-                self.delete(line.start, line.start + '+ %dc' % len(line.indent))
-                self.insert(line.start, line2.indent)
-                #print( repr(line2.indent) )
-                return "break"
+        self.insert(INSERT, '    ')
+        return "break"
 
     def on_shift_tab(self, event=None):
         "Remove indentation (same as above line with lesser)"
         line = self.mainframe.texthelper.Line(self)
         if line.indent:
-            # find nearest above line with lesser indentation
-            for i in range(line.n, 1, -1):
-                line2 = self.mainframe.texthelper.Line(self, i)
-                if len(line.indent) > len(line2.indent):
-                    self.delete(line.start, line.start + '+ %dc' % len(line.indent))
-                    self.insert(line.start, line2.indent)
-                    #print( repr(line2.indent) )
-                    break
+            self.delete(line.start, line.start + '+ 4c')
         return "break"
 
     def on_home(self, event=None):
