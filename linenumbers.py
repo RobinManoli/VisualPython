@@ -7,7 +7,7 @@ class LineNumbers(Canvas):
     """
     """
     def __init__(self, parent, textarea):
-        Canvas.__init__(self, parent, relief=FLAT, width='1.5c')
+        Canvas.__init__(self, parent, relief=FLAT, width='1.6c')
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
@@ -18,17 +18,22 @@ class LineNumbers(Canvas):
         self.linetool_item = None
 
         self.bind('<Motion>', self.on_motion)
+        self.bind('<Leave>', self.clear_linetool_item)
         self.bind('<Button-1>', self.on_click)
 
+    def clear_linetool_item(self, event=None):
+        if self.linetool_item:
+            self.delete( self.linetool_item )
+            self.linetool_item = None
+        
     def on_motion(self, event=None):
         #print(dir(event))
         coords = '@%d,%d' % (event.x, event.y)
         bbox = self.textarea.bbox(coords)
         if bbox:
-            if self.linetool_item:
-                self.delete( self.linetool_item )
             x, y, width, height = bbox
-            item = self.create_text((30,y), text="#//", anchor=NW)
+            item = self.create_text((40,y), text="#//", anchor=NW)
+            self.clear_linetool_item()
             self.linetool_item = item
 
     def on_click(self, event=None):
