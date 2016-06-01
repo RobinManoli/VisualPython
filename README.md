@@ -6,7 +6,7 @@ Proof of concept editor, visualizing Python code more than just keyword highligh
 
 ## Requirements
 - Python 2 or 3
-- Tkinter
+- Tkinter, ttk
 - Pygments (tested 2.1.3)
 
 ## Features
