@@ -60,8 +60,12 @@ class NoteBookMenu(Menu):
         self.root.bind_all('<Control-F4>', self.close)
     
     def close(self, event=None):
-        # todo: destroy Editor instance too (not just Frame)?
+        # todo: trigger close on clicked tab, not active tab
         # todo: confirm close unsaved
-        self.NoteBook.current_editor().destroy()
+        current_editor = self.NoteBook.current_editor()
+        index = self.NoteBook.editors.index(current_editor)
+        current_editor.destroy()
+        self.NoteBook.editors.pop(index)
+        
 
 
