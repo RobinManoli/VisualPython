@@ -18,4 +18,4 @@ Proof of concept editor, visualizing Python code more than just keyword highligh
 
 ![move mouse cursor outside textarea to see whitespace](https://raw.githubusercontent.com/RobinManoli/VisualPython/master/img/whitespace.jpg)
 
-- comments/uncomments lines when double-clicking the corresponding line number
+- comments/uncomments lines when clicking the corresponding line number
