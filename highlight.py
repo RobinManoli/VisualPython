@@ -156,6 +156,11 @@ class HighLight():
         self.clear('Token.')
 
     def tokens(self, event=None):
+        """
+        Highlight tokens as rendered by Pygments. Seems to only work after textarea is updated, though calling update_idletasks has no effect.
+        The problem can be solved by recalling the function if there is no bbox, (as with update_linenumbers), or figure out what is not updated
+        when running this function (bbox was the case in update_linenumbers).
+        """
         # http://stackoverflow.com/a/30199105
         from pygments import lex, highlight
         from pygments.lexers import PythonLexer

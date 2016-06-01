@@ -59,8 +59,10 @@ class LineTools(Text):
     def update_linenumbers(self, event=None):
         # get content, but don't include the last newline inserted by tkinter
         content = self.textarea.get(1.0, "end-1c")
+        # need to update_idletasks before bbox working, according to http://effbot.org/tkinterbook/text.htm#Tkinter.Text.bbox-method
+        # self.textarea.update_idletasks() # no effect though
         linenumbers = ''
-        width = self.textarea.cget('width')
+        #width = self.textarea.cget('width')
         for i, text in enumerate(content.split('\n')):
             linenumbers += str(i+1)
             linenumbers += '\n'
@@ -73,6 +75,11 @@ class LineTools(Text):
                 linenumbers += '\n' * int(wrapped_line_height/unwrapped_line_height)
                 # works except width doesn't mean actual width
                 # linenumbers += '\n' * (1 + int(len(text)/width))
+            else:
+                # instead of update_idletasks(), to get bbox, redo this function after 100ms
+                self.after(100, self.update_linenumbers)
+                return
+
         # remove last addition (of loop) of new line
         linenumbers = linenumbers[:-1]
 
