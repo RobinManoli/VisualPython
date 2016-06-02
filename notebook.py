@@ -56,6 +56,7 @@ class NoteBook(Notebook):
                 self.tab(i, text=ed.fname + modified)
                 
     def on_rclick(self, event=None):
+        self.menu.on_rclick_tab(event)
         self.menu.post(event.x_root, event.y_root)
 
 
@@ -65,25 +66,30 @@ except:
     from tkMessageBox import askyesno
 
 class NoteBookMenu(Menu):
-    def __init__(self, NoteBook):
-        self.NoteBook = NoteBook
-        self.mainframe = NoteBook.mainframe
-        self.root = NoteBook.root
+    def __init__(self, notebook):
+        self.notebook = notebook
+        self.mainframe = notebook.mainframe
+        self.root = notebook.root
         Menu.__init__(self, self.root, tearoff=0)
 
-        self.add_command(label="Close", command=self.close, accelerator="Ctrl+F4")
+        self.add_command(label="Close", command=lambda: self.close(ed=self.rclicked_editor), accelerator="Ctrl+F4")
         self.root.bind_all('<Control-F4>', self.close)
+        
+    def on_rclick_tab(self, event):
+        index = self.notebook.index( '@%d,%d' % (event.x,event.y) )
+        self.rclicked_editor = self.notebook.editors[index]
     
-    def close(self, event=None):
+    def close(self, event=None, ed=None):
         # todo: trigger close on clicked tab, not active tab
-        # todo: confirm close unsaved
-        ed = self.NoteBook.current_editor()
+        if not ed:
+            # happens on Control-F4
+            ed = self.notebook.current_editor()
         if ed.textarea.edit_modified():
             if self.mainframe.filemenu.prompt_save(ed) is None:
                 return
-        index = self.NoteBook.editors.index(ed)
+        index = self.notebook.editors.index(ed)
         ed.destroy()
-        self.NoteBook.editors.pop(index)
+        self.notebook.editors.pop(index)
         
 
 

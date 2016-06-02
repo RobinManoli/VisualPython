@@ -26,6 +26,8 @@ class Editor(Frame):
         self.scrollbarY.pack(side=RIGHT, fill=Y)
         self.scrollbarY.config(command=self.textarea.scrollY)
 
+        #self.bind('<Button-3>', self.on_rclick)
+
         #print( self.mainframe.f )
         #self.textarea.delete(1.0, END)
         if self.f:
