@@ -72,6 +72,7 @@ class FileMenu(Menu):
     def before_exit(self):
         for editor in self.notebook.editors:
             if editor.textarea.edit_modified():
+                self.notebook.select( editor )
                 fname = editor.fpathname or editor.fname
                 msg = "Save '%s' before exiting?" % fname
                 ans = askyesnocancel(message=msg)
