@@ -58,6 +58,12 @@ class NoteBook(Notebook):
     def on_rclick(self, event=None):
         self.menu.post(event.x_root, event.y_root)
 
+
+try:
+    from tkinter.messagebox import askyesno
+except:
+    from tkMessageBox import askyesno
+
 class NoteBookMenu(Menu):
     def __init__(self, NoteBook):
         self.NoteBook = NoteBook
@@ -71,9 +77,12 @@ class NoteBookMenu(Menu):
     def close(self, event=None):
         # todo: trigger close on clicked tab, not active tab
         # todo: confirm close unsaved
-        current_editor = self.NoteBook.current_editor()
-        index = self.NoteBook.editors.index(current_editor)
-        current_editor.destroy()
+        ed = self.NoteBook.current_editor()
+        if ed.textarea.edit_modified():
+            if self.mainframe.filemenu.prompt_save(ed) is None:
+                return
+        index = self.NoteBook.editors.index(ed)
+        ed.destroy()
         self.NoteBook.editors.pop(index)
         
 

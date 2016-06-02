@@ -5,7 +5,7 @@ try:
 except:
     from Tkinter import *
     from tkFileDialog import askopenfilename, asksaveasfilename
-    from tkMessageBox import askokcancel
+    from tkMessageBox import askyesnocancel, askokcancel, showinfo
 
 class FileMenu(Menu):
     """
@@ -67,20 +67,22 @@ class FileMenu(Menu):
         self.write(editor=editor)
         # file saved
         return True
+
+    def prompt_save(self, editor):
+        fname = editor.fpathname or editor.fname
+        msg = "Save '%s' before closing?" % fname
+        ans = askyesnocancel(message=msg)
+        if ans:
+            # return cancel if selected save and then not saved
+            return True if self.save(editor) else None
+        return ans
         
 
     def before_exit(self):
         for editor in self.notebook.editors:
             if editor.textarea.edit_modified():
                 self.notebook.select( editor )
-                fname = editor.fpathname or editor.fname
-                msg = "Save '%s' before exiting?" % fname
-                ans = askyesnocancel(message=msg)
-                if ans:
-                    if not self.save(editor):
-                        # save action cancelled
-                        return
-                elif ans is None:
+                if self.prompt_save(editor) is None:
                     # cancel pressed - close editor manually to discard changes
                     return
                 # No returns False
