@@ -15,6 +15,7 @@ class NoteBook(Notebook):
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
+        self.mainframe.filemenu.notebook = self
 
         self.editors = []
 

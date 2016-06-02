@@ -3,7 +3,7 @@
 
 """
 Known bugs (TODO):
-    - on_tab and _shift_tab buggy, and visualizing tabs need to differ from spaces in color
+    - visualizing tabs need to differ from spaces in color
     - if scroll down to hide top content, then resize window down and then maximize top content into view, it doesn't get highlighted
     - highlight.whitspace (line 74), string index out of range if i <= ... content[i+1]
 
@@ -39,6 +39,8 @@ class MainFrame(Frame):
 
         self.notebook = notebook.NoteBook(self)
         self.notebook.pack(side=LEFT, fill=BOTH, expand=True)
+
+        self.root.protocol("WM_DELETE_WINDOW", self.filemenu.on_exit)
 
         import sys
         if len( sys.argv ) > 1:

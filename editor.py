@@ -12,9 +12,8 @@ class Editor(Frame):
         self.parent = parent
         self.mainframe = parent.mainframe
         self.root = parent.root
-        
-        self.fpathname = fpathname
-        self.f = self.mainframe.filemenu.open( fpathname ) if fpathname else None
+
+        self.open(fpathname)
         from os import path
         self.fname = path.basename(fpathname) if fpathname else 'new'
         self.scrollbarY = Scrollbar(self)
@@ -37,3 +36,6 @@ class Editor(Frame):
             self.textarea.edit_reset()
             self.textarea.on_key_release()
 
+    def open(self, fpathname):
+        self.f = self.mainframe.filemenu.open( fpathname ) if fpathname else None
+        self.fpathname = fpathname
