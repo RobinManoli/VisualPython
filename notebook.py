@@ -40,11 +40,13 @@ class NoteBook(Notebook):
         current = self.current_editor()
         for ed in self.editors:
             i = self.editors.index(ed)
+            modified = ' *' if ed.textarea.edit_modified() else ''
             if current == ed:
+                text = ed.fpathname or ed.fname
                 # fpathname exists only on saved files
-                self.tab(i, text=ed.fpathname or ed.fname)
+                self.tab(i, text=text + modified)
             else:
-                self.tab(i, text=ed.fname)
+                self.tab(i, text=ed.fname + modified)
                 
     def on_rclick(self, event=None):
         self.menu.post(event.x_root, event.y_root)

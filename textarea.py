@@ -16,7 +16,7 @@ class TextArea(Text):
         self.init()
 
     def init(self):
-        #self.bind('<<Modified>>', self.changed) # works only once
+        self.bind('<<Modified>>', self.mainframe.notebook.after_click) # works only once, when .edit_modified() becomes True
         self.bind('<KeyRelease>', self.on_key_release)
         self.bind('<Motion>', self.on_motion)
         self.bind('<Enter>', self.on_enter)

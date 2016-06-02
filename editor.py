@@ -31,5 +31,9 @@ class Editor(Frame):
         #self.textarea.delete(1.0, END)
         if self.f:
             self.textarea.insert(1.0, self.f.read())
+            # set textarea to not modified after original insertion
+            self.textarea.edit_modified(False)
+            # clear the undo stack not to be able to undo to empty textarea
+            self.textarea.edit_reset()
             self.textarea.on_key_release()
 

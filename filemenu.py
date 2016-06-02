@@ -38,6 +38,7 @@ class FileMenu(Menu):
         editor.f.write(content)
         editor.f.truncate()
         #editor.f.close()
+        self.mainframe.notebook.after_click(event)
         return "break"
 
     def load(self, event=None):
