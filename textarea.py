@@ -13,9 +13,6 @@ class TextArea(Text):
         self.scrollbarY = parent.scrollbarY
         self.texthelper = self.mainframe.texthelper
         
-        self.init()
-
-    def init(self):
         self.bind('<<Modified>>', self.mainframe.notebook.after_click) # works only once, when .edit_modified() becomes True
         self.bind('<KeyRelease>', self.on_key_release)
         self.bind('<Motion>', self.on_motion)
