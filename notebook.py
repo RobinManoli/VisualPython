@@ -33,8 +33,14 @@ class NoteBook(Notebook):
         self.after_click()
 
     def current_editor(self):
-        index = self.index( self.select() )
-        return self.editors[index]
+        #print(self.select())
+        try:
+            index = self.index( self.select() )
+            return self.editors[index]
+        except TclError:
+            # this might occur if notebook/editor is not initiated yet
+            # perhaps since after_click happens on many occations
+            pass
 
     def after_click(self, event=None):
         current = self.current_editor()
