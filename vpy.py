@@ -40,7 +40,7 @@ class MainFrame(Frame):
         self.notebook = notebook.NoteBook(self)
         self.notebook.pack(side=LEFT, fill=BOTH, expand=True)
 
-        self.root.protocol("WM_DELETE_WINDOW", self.filemenu.on_exit)
+        self.root.protocol("WM_DELETE_WINDOW", self.filemenu.before_exit)
 
         import sys
         if len( sys.argv ) > 1:

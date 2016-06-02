@@ -69,7 +69,7 @@ class FileMenu(Menu):
         return True
         
 
-    def on_exit(self):
+    def before_exit(self):
         for editor in self.notebook.editors:
             if editor.textarea.edit_modified():
                 fname = editor.fpathname or editor.fname
